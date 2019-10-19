@@ -27,14 +27,14 @@ export interface DirectiveBinding {
   modifiers: DirectiveModifiers
 }
 
-export type DirectiveHook<T = any> = (
+export type DirectiveHook<T extends Element = any> = (
   el: T,
   binding: DirectiveBinding,
   vnode: VNode<any, T>,
   prevVNode: VNode<any, T> | null
 ) => void
 
-export interface ObjectDirective<T = any> {
+export interface ObjectDirective<T extends Element = any> {
   beforeMount?: DirectiveHook<T>
   mounted?: DirectiveHook<T>
   beforeUpdate?: DirectiveHook<T>
@@ -43,9 +43,11 @@ export interface ObjectDirective<T = any> {
   unmounted?: DirectiveHook<T>
 }
 
-export type FunctionDirective<T = any> = DirectiveHook<T>
+export type FunctionDirective<T extends Element = any> = DirectiveHook<T>
 
-export type Directive<T = any> = ObjectDirective<T> | FunctionDirective<T>
+export type Directive<T extends Element = any> =
+  | ObjectDirective<T>
+  | FunctionDirective<T>
 
 type DirectiveModifiers = Record<string, boolean>
 

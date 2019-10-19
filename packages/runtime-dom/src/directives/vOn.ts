@@ -4,23 +4,25 @@ type KeyedEvent = KeyboardEvent | MouseEvent | TouchEvent
 
 const modifierGuards: Record<
   string,
-  (e: Event, modifiers?: string[]) => void | boolean
+  (e: Event, modifiers: string[]) => void | boolean
 > = {
   stop: e => e.stopPropagation(),
   prevent: e => e.preventDefault(),
   self: e => e.target !== e.currentTarget,
-  ctrl: e => !(e as KeyedEvent).ctrlKey,
-  shift: e => !(e as KeyedEvent).shiftKey,
-  alt: e => !(e as KeyedEvent).altKey,
-  meta: e => !(e as KeyedEvent).metaKey,
-  left: e => 'button' in e && (e as MouseEvent).button !== 0,
-  middle: e => 'button' in e && (e as MouseEvent).button !== 1,
-  right: e => 'button' in e && (e as MouseEvent).button !== 2,
-  exact: (e, modifiers: string[]) =>
+  ctrl: (e: KeyedEvent) => !e.ctrlKey,
+  shift: (e: KeyedEvent) => !e.shiftKey,
+  alt: (e: KeyedEvent) => !e.altKey,
+  meta: (e: KeyedEvent) => !e.metaKey,
+  left: (e: MouseEvent) => 'button' in e && e.button !== 0,
+  middle: (e: MouseEvent) => 'button' in e && e.button !== 1,
+  right: (e: MouseEvent) => 'button' in e && e.button !== 2,
+  exact: (e, modifiers) =>
     systemModifiers.some(m => (e as any)[`${m}Key`] && !modifiers.includes(m))
 }
 
-export const withModifiers = (fn: Function, modifiers: string[]) => {
+type EventFunc = (ev: Event) => any
+
+export const withModifiers = (fn: EventFunc, modifiers: string[]) => {
   return (event: Event) => {
     for (let i = 0; i < modifiers.length; i++) {
       const guard = modifierGuards[modifiers[i]]
@@ -42,7 +44,7 @@ const keyNames: Record<string, string | string[]> = {
   delete: 'backspace'
 }
 
-export const withKeys = (fn: Function, modifiers: string[]) => {
+export const withKeys = (fn: EventFunc, modifiers: string[]) => {
   return (event: KeyboardEvent) => {
     if (!('key' in event)) return
     const eventKey = event.key.toLowerCase()

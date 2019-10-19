@@ -29,13 +29,15 @@ function trigger(el: HTMLElement, type: string) {
 }
 
 function toNumber(val: string): number | string {
-  const n = parseFloat(val)
-  return isNaN(n) ? val : n
+  const n = Number.parseFloat(val)
+  return Number.isNaN(n) ? val : n
 }
 
 // We are exporting the v-model runtime directly as vnode hooks so that it can
 // be tree-shaken in case v-model is never used.
-export const vModelText: ObjectDirective<HTMLInputElement | HTMLTextAreaElement> = {
+export const vModelText: ObjectDirective<
+  HTMLInputElement | HTMLTextAreaElement
+> = {
   beforeMount(el, { value, modifiers: { lazy, trim, number } }, vnode) {
     el.value = value
     const assign = getModelAssigner(vnode)
